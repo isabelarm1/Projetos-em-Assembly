@@ -1,0 +1,1589 @@
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.5.0
+OBJECT MODULE PLACED IN .\Objects\timer-12-as.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE timer-12-as.asm SET(SMALL) DEBUG PRINT(.\Listings\timer-12-as.lst) OBJE
+                      CT(.\Objects\timer-12-as.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ; Programa Relogio Digital
+
+                       2     ; Dupla: Isabela Rocha e Andresa Fernandes
+
+                       3     ; Turma: 9841
+
+                       4     
+
+                       5     
+
+                       6     
+
+                       7     
+
+                       8     
+
+                       9     
+
+  00A4                10     Disp0                   equ                     P2.4
+
+  00A0                11     Disp1                   equ                     P2.0
+
+  00A1                12     Disp2                   equ                     P2.1
+
+  00A2                13     Disp3                   equ                     P2.2
+
+  00A3                14     Disp4                   equ                     P2.3
+
+  00A5                15     Disp5                   equ                     P2.5
+
+  00A6                16     Disp6                   equ                     P2.6
+
+  00A7                17     Disp7                   equ                     P2.7
+
+  00B0                18     Bdata                   equ                     P3.0
+
+  00B1                19     Bsem                    equ                     P3.1
+
+  00B2                20     Bsegs                   equ                     P3.2
+
+  00B3                21     Bmin                    equ                     P3.3
+
+  00B4                22     Bhor                    equ                     P3.4
+
+  00B5                23     Bdia                    equ                     P3.5
+
+  00B6                24     Bmes                    equ                     P3.6
+
+  00B7                25     Bano                    equ                     P3.7
+
+                      26             
+
+----                  27                                     dseg at 8                                       ; Memória d
+                             e dados
+
+                      28                     
+
+                      29     
+
+                      30     
+
+                      31     
+
+                      32     
+
+0008                  33     SEGS:                   ds                      1                               
+
+0009                  34     MIN:                    ds                      1                       
+
+000A                  35     HORA:                   ds                      1                               
+
+000B                  36     DIA:                    ds                      1                               
+
+000C                  37     MES:                    ds                      1                               
+
+000D                  38     ANO:                    ds                      1                               
+
+000E                  39     DIASEMANA:              ds                      1       
+
+000F                  40     Cmes:                   ds                      1                                       ; C
+                             have referente ao mês
+
+0010                  41     Cano:                   ds                      1                                       ; C
+                             have referente ao ano
+
+0011                  42     COD0:                   ds              1                                       ; US     UA
+                                   
+
+0012                  43     COD1:                   ds              1                               ; DS     DA  
+
+0013                  44     COD2:                   ds              1                               ;       - 
+
+0014                  45     COD3:                   ds              1                               ; UM     UM  
+
+0015                  46     COD4:                   ds              1                               ; DM     SM  
+
+0016                  47     COD5:                   ds              1                                       ;       -  
+                                          3ª Letra do dia
+
+0017                  48     COD6:                   ds              1                               ; UH     UD        
+                                  2ª Letra do dia  
+
+0018                  49     COD7:                   ds              1                               ; DH     DD        
+                                  1ª Letra do dia
+
+0019                  50     CONTL:                  ds                      1                                       ; P
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     2
+
+                             arte LOW do contador low(480) = 0E1h = 224
+
+001A                  51     CONTH:                  ds                      1                                       ; P
+                             arte HIGH do contador high(480) = 01h = 1    
+
+                      52     
+
+                      53             
+
+----                  54                                     cseg                                                    ;  
+                             Segmento de Programa
+
+                      55     
+
+                      56     
+
+                      57     
+
+                      58     
+
+0000                  59     inicio: 
+
+0000 750800           60                                     mov                     SEGS,#0
+
+0003 750900           61                                     mov                     MIN,#0
+
+0006 750A0C           62                                     mov                     HORA,#12
+
+0009 750B14           63                                     mov                     DIA,#20
+
+000C 750C04           64                                     mov                     MES,#4
+
+000F 750D15           65                                     mov                     ANO,#21
+
+                      66                     
+
+                      67                             
+
+                      68     
+
+                      69     
+
+                      70     
+
+                      71                                     
+
+                      72                                     ; Inicializa o display: O Disp 0 é o primeiro a ser ligado
+
+0012 C2A4             73                                     clr             Disp0                           ; Disp0 = 0
+                                          
+
+0014 D2A0             74                                     setb            Disp1                           ; Disp1 = 1
+                                          
+
+0016 D2A1             75                                     setb            Disp2                           ; Disp2 = 1
+                                        
+
+0018 D2A2             76                                     setb            Disp3                           ; Disp3 = 1
+                                         
+
+001A D2A3             77                                     setb            Disp4                           ; Disp4 = 1
+                                          
+
+001C D2A5             78                                     setb            Disp5                           ; Disp5 = 1
+                                          
+
+001E D2A6             79                                     setb            Disp6                           ; Disp6 = 1
+                                       
+
+0020 D2A7             80                                     setb            Disp7                           ; Disp7 = 1
+
+                      81                                     
+
+0022                  82     varreduradisplay:
+
+0022 30A415           83                                     jnb             Disp0,rot1          ; Disp0 = 0?
+
+0025 30A01B           84                                     jnb             Disp1,rot2                      ; Disp1 = 0
+                             ?
+
+0028 30A121           85                                     jnb             Disp2,rot3                      ; Disp2 = 0
+                             ?
+
+002B 30A227           86                                     jnb             Disp3,rot4                      ; Disp3 = 0
+                             ?
+
+002E 30A32D           87                                     jnb             Disp4,rot5                      ; Disp4 = 0
+                             ?
+
+0031 30A533           88                                     jnb             Disp5,rot6                      ; Disp5 = 0
+                             ?
+
+0034 30A639           89                                     jnb             Disp6,rot7                      ; Disp6 = 0
+                             ?
+
+0037 30A73F           90                                     jnb             Disp7,rot0                      ; Disp7 = 0
+                             ?
+
+                      91               
+
+003A                  92     rot1:     
+
+003A D2A4             93                                     setb            Disp0                           ; Disp0 = 1
+
+003C 851280           94                                     mov             P0,COD1
+
+003F C2A0             95                                     clr             Disp1                           ; Disp1 = 0
+
+0041 803F             96                                     jmp             encontro 
+
+                      97     
+
+0043                  98     rot2:     
+
+0043 D2A0             99                                     setb            Disp1                           ; Disp1 = 1
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     3
+
+0045 851380          100                                     mov             P0,COD2
+
+0048 C2A1            101                                     clr             Disp2                           ; Disp2 = 0
+                                  
+
+004A 8036            102                                     jmp             encontro
+
+                     103               
+
+004C                 104     rot3:    
+
+004C D2A1            105                                     setb            Disp2                           ; Disp2 = 1
+
+004E 851480          106                                     mov             P0,COD3 
+
+0051 C2A2            107                                     clr             Disp3                           ; Disp3 = 0
+
+0053 802D            108                                     jmp             encontro
+
+                     109               
+
+0055                 110     rot4:    
+
+0055 D2A2            111                                     setb            Disp3                           ; Disp3 = 1
+
+0057 851580          112                                     mov             P0,COD4
+
+005A C2A3            113                                     clr             Disp4                           ; Disp4 = 0
+
+005C 8024            114                                     jmp             encontro
+
+                     115               
+
+005E                 116     rot5:     
+
+005E D2A3            117                                     setb            Disp4                           ; Disp4 = 1
+
+0060 851680          118                                     mov             P0,COD5
+
+0063 C2A5            119                                     clr             Disp5                           ; Disp5 = 0
+
+0065 801B            120                                     jmp             encontro
+
+                     121               
+
+0067                 122     rot6:     
+
+0067 D2A5            123                                     setb            Disp5                           ; Disp5 = 1
+
+0069 851780          124                                     mov             P0,COD6
+
+006C C2A6            125                                     clr             Disp6                           ; Disp6 = 0
+
+006E 8012            126                                     jmp             encontro
+
+                     127               
+
+0070                 128     rot7:     
+
+0070 D2A6            129                                     setb            Disp6                           ; Disp6 = 1
+
+0072 851880          130                                     mov             P0,COD7
+
+0075 C2A7            131                                     clr             Disp7                           ; Disp7 = 0
+
+0077 8009            132                                     jmp             encontro
+
+                     133               
+
+0079                 134     rot0:     
+
+0079 D2A7            135                                     setb            Disp7                           ; Disp7 = 1
+
+007B 851180          136                                     mov             P0,COD0
+
+007E C2A4            137                                     clr             Disp0                           ; Disp0 = 0
+
+0080 8000            138                                     jmp             encontro 
+
+                     139     
+
+                     140     
+
+                     141     
+
+                     142     
+
+                     143     
+
+                     144     
+
+                     145     
+
+                     146     
+
+0082 758900          147     encontro:               mov         TMOD,#00h                                              
+                                                          ; Modo Zero
+
+0085 758CBF          148                                     mov     TH0,#(256-65)                                      
+                                                                  ; Inicializa o N
+
+0088 D28C            149                                     setb    TR0                                                
+                                                                          ; Liga timer
+
+008A 308DFD          150     denovo:                 jnb     TF0,$                                                      
+                                                                  ; Aguarda o overflow
+
+008D C28D            151                                     clr     TF0                                                
+                                                                          ; Zera aviso de overflow 
+
+                     152     
+
+008F 758CBF          153                                     mov     TH0,#(256-65)                                      
+                                                                  ; FUNÇÃO recarga
+
+                     154     
+
+                     155     
+
+                     156     
+
+                     157     
+
+0092                 158     ConverteAno:    
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     4
+
+0092 E50D            159                                     mov                     a,ANO
+
+0094 75F004          160                                     mov                     b,#4
+
+0097 84              161                                     div                     ab                                 
+                                  ; Dois últimos algarismos do ano serão divididos por 4, quociente -> r0
+
+0098 F8              162                                     mov                     r0,a
+
+0099 E50D            163                                     mov                     a,ANO
+
+009B 75F007          164                                     mov                     b,#7
+
+009E 84              165                                     div                     ab                                 
+                                  ; Dois últimos algarismos do ano serão divididos por 7, resto -> b
+
+009F E8              166                                     mov                     a,r0
+
+00A0 25F0            167                                     add                     a,b                                
+                                  ; Quociente + Resto
+
+00A2 75F007          168                                     mov                     b,#7
+
+00A5 B40705          169                                     cjne            a,#7,dif7                       ; Soma != 7
+                             ?
+
+00A8 751006          170                                     mov                     Cano,#6
+
+00AB 8012            171                                     jmp                     ConverteMes
+
+                     172                             
+
+00AD                 173     dif7:           
+
+00AD 4009            174                                     jc                      SOMA_MENOR                      ; S
+                             oma < 7?
+
+00AF 84              175                                     div                     ab                                 
+                                  ; Soma / 7
+
+00B0 E5F0            176                                     mov                     a,b                                
+                                  ; Resto -> a
+
+00B2 9401            177                                     subb            a,#1                            ; Resto - 1
+                              -> a
+
+00B4 F510            178                                     mov                     Cano,a
+
+00B6 8007            179                                     jmp                     ConverteMes
+
+                     180                             
+
+00B8                 181     SOMA_MENOR:     
+
+00B8 C3              182                                     clr                     c
+
+00B9 9401            183                                     subb            a,#1                            ; Soma - 1 
+                             -> a
+
+00BB F510            184                                     mov                     Cano,a
+
+00BD 8000            185                                     jmp                     ConverteMes
+
+                     186                             
+
+                     187     ;       ---     Conversão do Mês ---
+
+00BF                 188     ConverteMes:            
+
+00BF E50C            189                                     mov                     a,MES
+
+00C1 B40105          190                                     cjne            a,#1,difjaneiro         ; mes != 1?
+
+00C4 750F01          191                                     mov                     Cmes,#1
+
+00C7 8055            192                                     jmp                     CALCDIA
+
+00C9                 193     difjaneiro:             
+
+00C9 B40205          194                                     cjne            a,#2,diffevereiro       ; mes != 2?
+
+00CC 750F04          195                                     mov                     Cmes,#4
+
+00CF 804D            196                                     jmp                     CALCDIA
+
+00D1                 197     diffevereiro:   
+
+00D1 B40305          198                                     cjne            a,#3,difmarco           ; mes != 3?
+
+00D4 750F04          199                                     mov                     Cmes,#4
+
+00D7 8045            200                                     jmp                     CALCDIA
+
+00D9                 201     difmarco:               
+
+00D9 B40405          202                                     cjne            a,#4,difabril           ; mes != 4?
+
+00DC 750F00          203                                     mov                     Cmes,#0
+
+00DF 803D            204                                     jmp                     CALCDIA
+
+00E1                 205     difabril:               
+
+00E1 B40505          206                                     cjne            a,#5,difmaio            ; mes != 5?
+
+00E4 750F02          207                                     mov                     Cmes,#2
+
+00E7 8035            208                                     jmp                     CALCDIA
+
+00E9                 209     difmaio:                
+
+00E9 B40605          210                                     cjne            a,#6,difjunho           ; mes != 6?
+
+00EC 750F05          211                                     mov                     Cmes,#5
+
+00EF 802D            212                                     jmp                     CALCDIA
+
+00F1                 213     difjunho:               
+
+00F1 B40705          214                                     cjne            a,#7,difjulho           ; mes != 7?
+
+00F4 750F00          215                                     mov                     Cmes,#0
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     5
+
+00F7 8025            216                                     jmp                     CALCDIA
+
+00F9                 217     difjulho:               
+
+00F9 B40805          218                                     cjne            a,#8,difagosto          ; mes != 8?
+
+00FC 750F03          219                                     mov                     Cmes,#3
+
+00FF 801D            220                                     jmp                     CALCDIA
+
+0101                 221     difagosto:              
+
+0101 B40905          222                                     cjne            a,#9,difsetembro        ; mes != 9?
+
+0104 750F06          223                                     mov                     Cmes,#6
+
+0107 8015            224                                     jmp                     CALCDIA
+
+0109                 225     difsetembro:    
+
+0109 B40A05          226                                     cjne            a,#10,difoutubro        ; mes != 10?
+
+010C 750F01          227                                     mov                     Cmes,#1
+
+010F 800D            228                                     jmp                     CALCDIA
+
+0111                 229     difoutubro:             
+
+0111 B40B05          230                                     cjne            a,#11,difnovembro       ; mes != 11?
+
+0114 750F04          231                                     mov                     Cmes,#4
+
+0117 8005            232                                     jmp                     CALCDIA
+
+0119                 233     difnovembro:    
+
+0119 750F06          234                                     mov                     Cmes,#6
+
+011C 8000            235                                     jmp                     CALCDIA
+
+                     236                                                     
+
+                     237     
+
+                     238     
+
+                     239     
+
+                     240     
+
+011E                 241     CALCDIA:        
+
+011E E50B            242                                     mov                     a,DIA
+
+0120 850FF0          243                                     mov                     b,Cmes
+
+0123 25F0            244                                     add                     a,b     
+
+0125 8510F0          245                                     mov                     b,Cano
+
+0128 25F0            246                                     add                     a,b
+
+012A 75F007          247                                     mov                     b,#7
+
+012D 84              248                                     div                     ab
+
+012E E5F0            249                                     mov                     a,b
+
+0130 85F00E          250                                     mov                     DIASEMANA,b
+
+                     251     
+
+                     252     
+
+                     253     
+
+                     254     
+
+                     255                             
+
+0133                 256     SELDISPLAY1:
+
+0133 30B107          257                                     jnb                     Bsem,MOSTRADIA          ; Bsem = 0?
+                                                  
+
+0136                 258     SELDISPLAY2:
+
+0136 30B002          259                                     jnb                     Bdata, MOSTRADATAx      ; Bdata = 0
+                             ?    
+
+0139 8072            260                                     jmp                     MOSTRAHORA
+
+                     261                             
+
+013B                 262     MOSTRADATAx:    
+
+013B 21E2            263                                     jmp                     MOSTRADATA
+
+013D                 264     MOSTRADIA:      
+
+013D 7511FF          265                                     mov                     COD0,#0FFh
+
+0140 7512FF          266                                     mov                     COD1,#0FFh
+
+0143 7513FF          267                                     mov                     COD2,#0FFh
+
+0146 7514FF          268                                     mov                     COD3,#0FFh
+
+0149 7515FF          269                                     mov                     COD4,#0FFh
+
+014C E50E            270                                     mov                     a,DIASEMANA
+
+014E B4000B          271                                     cjne            a,#0,difsab                     ; DIASEMANA
+                              != 0?
+
+0151 751892          272                                     mov                     COD7,#92h
+
+0154 751788          273                                     mov                     COD6,#88h
+
+0157 751683          274                                     mov                     COD5,#83h
+
+015A 4117            275                                     jmp                     contador
+
+015C                 276     difsab: 
+
+015C B4010B          277                                     cjne            a,#1,difdom                     ; DIASEMANA
+                              != 1?
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     6
+
+015F 7518A1          278                                     mov                     COD7,#0A1h
+
+0162 7517C0          279                                     mov                     COD6,#0C0h
+
+0165 7516C8          280                                     mov                     COD5,#0C8h
+
+0168 4117            281                                     jmp                     contador
+
+016A                 282     difdom: 
+
+016A B4020B          283                                     cjne            a,#2,difseg                     ; DIASEMANA
+                              != 2?
+
+016D 751892          284                                     mov                     COD7,#92h
+
+0170 751786          285                                     mov                     COD6,#86h
+
+0173 7516C2          286                                     mov                     COD5,#0C2h
+
+0176 4117            287                                     jmp                     contador
+
+0178                 288     difseg: 
+
+0178 B4030B          289                                     cjne            a,#3,difter                     ; DIASEMANA
+                              != 3?
+
+017B 751887          290                                     mov                     COD7,#087h
+
+017E 751786          291                                     mov                     COD6,#086h
+
+0181 7516CC          292                                     mov                     COD5,#0CCh
+
+0184 4117            293                                     jmp                     contador
+
+0186                 294     difter: 
+
+0186 B4040B          295                                     cjne            a,#4,difqua                     ; DIASEMANA
+                              != 4?
+
+0189 751898          296                                     mov                     COD7,#098h
+
+018C 7517C1          297                                     mov                     COD6,#0C1h
+
+018F 751688          298                                     mov                     COD5,#088h
+
+0192 4117            299                                     jmp                     contador
+
+0194                 300     difqua: 
+
+0194 B4050B          301                                     cjne            a,#5,difqui                     ; DIASEMANA
+                              != 5?
+
+0197 751898          302                                     mov                     COD7,#098h
+
+019A 7517C1          303                                     mov                     COD6,#0C1h
+
+019D 7516CF          304                                     mov                     COD5,#0CFh
+
+01A0 8075            305                                     jmp                     contador
+
+01A2                 306     difqui: 
+
+01A2 751892          307                                     mov                     COD7,#092h
+
+01A5 751786          308                                     mov                     COD6,#086h
+
+01A8 751689          309                                     mov                     COD5,#089h
+
+01AB 806A            310                                     jmp                     contador
+
+                     311                                                             
+
+                     312     
+
+                     313     
+
+                     314     
+
+                     315     
+
+01AD                 316     MOSTRAHORA:     
+
+01AD E508            317                                     mov                     a,SEGS
+
+01AF 75F00A          318                                     mov                     b,#10
+
+01B2 84              319                                     div                     ab                                 
+                                  ; a quociente   = dezena do segundo
+
+                     320                                                                                                
+                                  ; b resto               = unidade do segundo
+
+01B3 900363          321                                     mov                     dptr,#tabela            
+
+                     322             
+
+01B6 93              323                                     movc            a,@a+DPTR                       ; Pegar o c
+                             ódigo
+
+01B7 F512            324                                     mov                     COD1,a                          ; D
+                             ezena do display
+
+01B9 E5F0            325                                     mov                     a,b
+
+01BB 93              326                                     movc            a,@a+DPTR                       ; Pegar o c
+                             ódigo
+
+01BC F511            327                                     mov                     COD0,a                          ; U
+                             nidade
+
+                     328             
+
+                     329             
+
+01BE E509            330                                     mov                     a, MIN
+
+01C0 75F00A          331                                     mov                     b, #10
+
+01C3 84              332                                     div                     ab                                 
+                                  ; a quociente   = dezena do minuto
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     7
+
+                     333                                                                                                
+                                  ; b resto               = unidade do minuto
+
+                     334             
+
+01C4 93              335                                     movc            a,@a+dptr                       ; Busca a d
+                             ezena do minuto na tabela
+
+01C5 F515            336                                     mov                     COD4,a                          ; E
+                             ntrega a dezena do minuto ao COD4
+
+01C7 E5F0            337                                     mov                     a,b                                
+                                  ; Move a unidade de minuto para o acumulador para habilitar a função de index
+
+01C9 93              338                                     movc            a,@a+dptr                       ; Busca a u
+                             nidade de minuto na tabela
+
+01CA F514            339                                     mov                     COD3,a                          ; E
+                             ntrega a unidade de minuto ao COD3
+
+                     340             
+
+                     341             
+
+01CC E50A            342                                     mov                     a, HORA
+
+01CE 75F00A          343                                     mov                     b, #10
+
+01D1 84              344                                     div                     ab                                 
+                                  ; a quociente   = dezena da hora
+
+                     345                                                                                                
+                                  ; b resto               = unidade da hora
+
+                     346             
+
+01D2 93              347                                     movc            a,@a+dptr                       ; Busca a d
+                             ezena da hora na tabela
+
+01D3 F518            348                                     mov                     COD7,a                          ; E
+                             ntrega a dezena da hora ao COD7
+
+01D5 E5F0            349                                     mov                     a,b                                
+                                  ; Move a unidade da hora para o acumulador para habilitar a função de index
+
+01D7 93              350                                     movc            a,@a+dptr                       ; Busca a u
+                             nidade da hora na tabela
+
+01D8 F517            351                                     mov                     COD6,a                          ; E
+                             ntrega a unidade da hora ao COD6
+
+                     352             
+
+01DA 7513FF          353                                     mov             COD2,#0FFh
+
+01DD 7516FF          354                                     mov             COD5,#0FFh
+
+                     355     
+
+01E0 8035            356                                     jmp             contador
+
+                     357     
+
+                     358     
+
+                     359     
+
+                     360     
+
+                     361             
+
+01E2                 362     MOSTRADATA:
+
+01E2 E50D            363                                     mov             a,ANO
+
+01E4 75F00A          364                                     mov             b,#10
+
+01E7 84              365                                     div             ab                                         
+                                  ; a quociente   = dezena do ANO
+
+                     366                                                                                                
+                                  ; b resto               = unidade do ANO
+
+01E8 900363          367                                     mov             dptr,#tabela            
+
+                     368             
+
+01EB 93              369                                     movc    a,@a+DPTR                               ; Pegar o c
+                             ódigo
+
+01EC F512            370                                     mov             COD1,a                                  ; D
+                             ezena do display
+
+01EE E5F0            371                                     mov             a,b
+
+01F0 93              372                                     movc    a,@a+DPTR                               ; Pegar o c
+                             ódigo
+
+01F1 F511            373                                     mov             COD0,a                                  ; U
+                             nidade
+
+                     374             
+
+                     375             
+
+01F3 E50C            376                                     mov             a, MES
+
+01F5 75F00A          377                                     mov             b, #10
+
+01F8 84              378                                     div             ab                                         
+                                  ; a quociente   = dezena do MÊS
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     8
+
+                     379                                                                                                
+                                  ; b resto               = unidade do MÊS
+
+                     380             
+
+01F9 93              381                                     movc    a,@a+dptr                               ; Busca a d
+                             ezena do MÊS na tabela
+
+01FA F515            382                                     mov             COD4,a                                  ; E
+                             ntrega a dezena do MÊS ao COD4
+
+01FC E5F0            383                                     mov             a,b                                        
+                                  ; Move a unidade de MÊS para o acumulador para habilitar a função de index
+
+01FE 93              384                                     movc    a,@a+dptr                               ; Busca a u
+                             nidade de MêS na tabela
+
+01FF F514            385                                     mov             COD3,a                                  ; E
+                             ntrega a unidade de MÊS ao COD3
+
+                     386             
+
+                     387             
+
+0201 E50B            388                                     mov             a, DIA
+
+0203 75F00A          389                                     mov             b, #10
+
+0206 84              390                                     div             ab                                         
+                                  ; a quociente   = dezena do dia
+
+                     391                                                                                                
+                                  ; b resto               = unidade do dia
+
+                     392             
+
+0207 93              393                                     movc    a,@a+dptr                               ; Busca a d
+                             ezena do dia na tabela
+
+0208 F518            394                                     mov             COD7,a                                  ; E
+                             ntrega a dezena do dia ao COD7
+
+020A E5F0            395                                     mov             a,b                                        
+                                  ; Move a unidade do dia para o acumulador para habilitar a função de index
+
+020C 93              396                                     movc    a,@a+dptr                               ; Busca a u
+                             nidade do dia na tabela
+
+020D F517            397                                     mov             COD6,a                                  ; E
+                             ntrega a unidade do dia ao COD6
+
+                     398             
+
+020F 7513BF          399                                     mov             COD2,#0BFh
+
+0212 7516BF          400                                     mov             COD5,#0BFh
+
+                     401             
+
+0215 8000            402                                     jmp             contador
+
+                     403     
+
+                     404     
+
+                     405     
+
+                     406     
+
+                     407     
+
+                     408     
+
+                     409     
+
+                     410     
+
+                     411     
+
+0217                 412     contador:               
+
+0217 0519            413                                     inc             CONTL                                   ; C
+                             ONTL = CONTL + 1
+
+0219 E519            414                                     mov     a,CONTL
+
+021B 7002            415                                     jnz     pular
+
+021D 051A            416                                     inc             CONTH
+
+021F                 417     pular:                  
+
+021F E51A            418                                     mov     a,CONTH
+
+0221 B40107          419                                     cjne    a,#high(480),difw               ; high de 480 = 1 C
+                             ONTH != #high(480)?
+
+0224 E519            420                                     mov             a,CONTL
+
+0226 B4E002          421                                     cjne    a,#low(480),difw                ; low de 480  = 224
+                              ou 0e0h CONTH != #low(480)?
+
+0229 8002            422                                     jmp             zeracontador
+
+022B 4008            423     difw:                   jc          varreduray
+
+022D                 424     zeracontador:   
+
+022D 751900          425                                     mov             CONTL,#0
+
+0230 751A00          426                                     mov             CONTH,#0
+
+0233 8002            427                                     jmp             volta
+
+                     428                     
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE     9
+
+0235                 429     varreduray:     
+
+0235 0122            430                                     jmp             varreduradisplay
+
+                     431     
+
+                     432                                     
+
+                     433     
+
+                     434     
+
+                     435     
+
+                     436     
+
+0237                 437     volta:  
+
+0237 0508            438                                     inc             SEGS                                    ; S
+                             EGS = SEGS + 1
+
+0239 E508            439                                     mov             a,SEGS
+
+023B B43C02          440                                     cjne    a,#60,dif                               ; A != 60?
+
+023E 8002            441                                     jmp             zeras                                   ; A
+                              =  60
+
+0240                 442     dif:    
+
+0240 401A            443                                     jc              encontro1x                      ; A < 60?
+
+0242                 444     zeras:  
+
+0242 750800          445                                     mov             SEGS,#0
+
+                     446     
+
+0245 0509            447                                     inc             MIN                                        
+                                  ; MIN = MIN + 1
+
+0247 E509            448                                     mov             a,MIN
+
+0249 B43C02          449                                     cjne    a,#60,dif2                              ; A != 60?
+
+024C 8002            450                                     jmp             zeras2                          ; A =  60
+
+024E                 451     dif2:   
+
+024E 400C            452                                     jc              encontro1x                      ; A < 60?
+
+0250                 453     zeras2: 
+
+0250 750900          454                                     mov             MIN,#0
+
+                     455     
+
+0253 050A            456                                     inc             HORA                                    ; H
+                             ORA = HORA + 1
+
+0255 E50A            457                                     mov             a,HORA
+
+0257 B41804          458                                     cjne    a,#24,dif3                              ; A < 24?
+
+025A 8004            459                                     jmp             zeras3                                  ; A
+                              =  60
+
+025C                 460     encontro1x:     
+
+025C 610A            461                                     jmp             encontro1       
+
+025E                 462     dif3:   
+
+025E 40FC            463                                     jc              encontro1x                      ; A < 60?
+
+0260                 464     zeras3: 
+
+0260 750A00          465                                     mov             HORA,#0
+
+0263 050B            466                                     inc             DIA
+
+0265 E50C            467                                     mov             a,MES
+
+0267 B40102          468                                     cjne    a,#1,difjan                             ; a != 1?
+
+026A 8064            469                                     jmp             mes31
+
+026C                 470     difjan: 
+
+026C B40202          471                                     cjne    a,#2,diffev                             ; a != 2?
+
+026F 806F            472                                     jmp             fev
+
+0271                 473     diffev: 
+
+0271 B40302          474                                     cjne    a,#3,difmar                             ; a != 3?
+
+0274 805A            475                                     jmp             mes31
+
+0276                 476     difmar: 
+
+0276 B40402          477                                     cjne    a,#4,difabr                             ; a != 4?
+
+0279 8045            478                                     jmp             mes30
+
+027B                 479     difabr: 
+
+027B B40502          480                                     cjne    a,#5,difmai                             ; a != 5?
+
+027E 8050            481                                     jmp             mes31
+
+0280                 482     difmai: 
+
+0280 B40602          483                                     cjne    a,#6,difjun                             ; a != 6?
+
+0283 803B            484                                     jmp             mes30
+
+0285                 485     difjun: 
+
+0285 B40702          486                                     cjne    a,#7,difjul                             ; a != 7?
+
+0288 8046            487                                     jmp             mes31
+
+028A                 488     difjul: 
+
+028A B40802          489                                     cjne    a,#8,difago                             ; a != 8?
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE    10
+
+028D 8041            490                                     jmp             mes31
+
+028F                 491     difago: 
+
+028F B40902          492                                     cjne    a,#9,difset                             ; a != 9?
+
+0292 802C            493                                     jmp             mes30
+
+0294                 494     difset: 
+
+0294 B40A02          495                                     cjne    a,#10,difout                    ; a != 10?
+
+0297 8037            496                                     jmp             mes31
+
+0299                 497     difout: 
+
+0299 B40B02          498                                     cjne    a,#11,difnov                    ; a != 11?
+
+029C 8022            499                                     jmp             mes30
+
+029E                 500     difnov: 
+
+029E B40C69          501                                     cjne    a,#12,encontro1                 ; a != 12?
+
+                     502                     
+
+02A1 E50B            503                                     mov             a,DIA
+
+02A3 B41F02          504                                     cjne    a,#31,dif31                             ; a != 13?
+
+02A6 8062            505                                     jmp             encontro1
+
+02A8                 506     dif31:  
+
+02A8 4060            507                                     jc              encontro1                               ; a
+                              < 13?
+
+02AA 750B01          508                                     mov             DIA,#1
+
+02AD 750C01          509                                     mov             MES,#1
+
+02B0 050D            510                                     inc             ANO                                        
+                                  ; ano = ano + 1
+
+02B2 E50D            511                                     mov             a,ANO
+
+02B4 B46302          512                                     cjne    a,#99,dif99                             ; a != 99?
+
+02B7 8051            513                                     jmp             encontro1
+
+02B9                 514     dif99:  
+
+02B9 404F            515                                     jc              encontro1                               ; a
+                              < 99?
+
+02BB 750D00          516                                     mov             ANO,#0
+
+02BE 804A            517                                     jmp             encontro1
+
+                     518             
+
+02C0                 519     mes30:          
+
+02C0 E50B            520                                     mov             a,DIA
+
+02C2 B41E02          521                                     cjne    a,#30,dif30                             ; a != 30?
+
+02C5 8043            522                                     jmp             encontro1
+
+02C7                 523     dif30:  
+
+02C7 4041            524                                     jc              encontro1                               ; a
+                              < 30?
+
+02C9 750B01          525                                     mov             DIA,#1
+
+02CC 050C            526                                     INC             MES                                        
+                                  ; mes = mes + 1
+
+02CE 803A            527                                     jmp             encontro1       
+
+                     528     
+
+02D0                 529     mes31:
+
+02D0 E50B            530                                     mov             a,DIA
+
+02D2 B41F02          531                                     cjne    a,#31,dif31x                    ; a != 31?
+
+02D5 8033            532                                     jmp             encontro1
+
+02D7                 533     dif31x: 
+
+02D7 4031            534                                     jc              encontro1                               ; a
+                              < 31?
+
+02D9 750B01          535                                     mov             DIA,#1
+
+02DC 050C            536                                     INC             MES                                        
+                                  ; mes = mes + 1
+
+02DE 802A            537                                     jmp             encontro1
+
+                     538     
+
+02E0                 539     fev:    
+
+02E0 E50D            540                                     mov             a,ANO
+
+02E2 75F004          541                                     mov             b,#4
+
+02E5 84              542                                     div             ab                                         
+                                  ; resto -> b
+
+02E6 E5F0            543                                     mov             a,b
+
+02E8 6010            544                                     jz              anobissexto                     ; a = 0?
+
+02EA E50B            545                                     mov             a,DIA
+
+02EC B41C02          546                                     cjne    a,#28,dif28                             ; a != 28?
+
+02EF 8019            547                                     jmp             encontro1
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE    11
+
+02F1                 548     dif28:  
+
+02F1 4017            549                                     jc              encontro1
+
+02F3 750B01          550                                     mov             DIA,#1
+
+02F6 050C            551                                     INC             MES                                        
+                                  ; mes = mes + 1
+
+02F8 8010            552                                     jmp             encontro1
+
+02FA                 553     anobissexto:
+
+02FA E50B            554                                     mov             a,DIA
+
+02FC B41D02          555                                     cjne    a,#29,dif29                             ; a != 29?
+
+02FF 8009            556                                     jmp             encontro1
+
+0301                 557     dif29:  
+
+0301 4007            558                                     jc              encontro1                               ; a
+                              < 29?
+
+0303 750B01          559                                     mov             DIA,#1
+
+0306 050C            560                                     INC             MES                                        
+                                  ; mes = mes + 1
+
+0308 8000            561                                     jmp             encontro1
+
+                     562     
+
+030A                 563     encontro1:
+
+030A 8000            564                                     jmp             ajuste
+
+                     565     
+
+                     566     
+
+                     567     
+
+                     568     
+
+                     569     
+
+030C                 570     ajuste:
+
+030C 30B211          571                                     jnb             Bsegs,ajusteseg
+
+030F                 572     continua1:
+
+030F 30B313          573                                     jnb             Bmin,ajustemin
+
+0312                 574     continua2:
+
+0312 30B41C          575                                     jnb             Bhor,ajustehora
+
+0315                 576     continua3:
+
+0315 30B525          577                                     jnb             Bdia,ajustedia
+
+0318                 578     continua4:
+
+0318 30B62E          579                                     jnb             Bmes,ajustemes
+
+031B                 580     continua5:
+
+031B 30B737          581                                     jnb             Bano,ajusteano
+
+031E 8041            582                                     jmp     varredurax
+
+                     583                                     
+
+0320                 584     ajusteseg:
+
+0320 750800          585                                     mov             SEGS,#0
+
+0323 80EA            586                                     jmp             continua1;
+
+                     587                                     
+
+0325                 588     ajustemin:
+
+0325 0509            589                                     inc             MIN                                        
+                                  ; MIN = MIN + 1
+
+0327 E509            590                                     mov             a,MIN
+
+0329 B43CE6          591                                     cjne    a,#60,continua2
+
+032C 750900          592                                     mov             MIN,#0
+
+032F 80E1            593                                     jmp             continua2
+
+                     594                                     
+
+0331                 595     ajustehora:             
+
+0331 050A            596                                     inc             HORA                                     ; 
+                             HORA = HORA + 1
+
+0333 E50A            597                                     mov             a,HORA
+
+0335 B418DD          598                                     cjne    a,#24,continua3
+
+0338 750A00          599                                     mov             HORA,#0
+
+033B 80D8            600                                     jmp             continua3
+
+                     601                                     
+
+033D                 602     ajustedia:              
+
+033D 050B            603                                     inc             DIA                                        
+                                   ; DIA = DIA + 1
+
+033F E50B            604                                     mov             a,DIA
+
+0341 B420D4          605                                     cjne    a,#32,continua4
+
+0344 750B01          606                                     mov             DIA,#1
+
+0347 80CF            607                                     jmp             continua4
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE    12
+
+                     608     
+
+0349                 609     ajustemes:              
+
+0349 050C            610                                     inc             MES                                        
+                                  ; MÊS = MÊS + 1
+
+034B E50C            611                                     mov             a,MES
+
+034D B40DCB          612                                     cjne    a,#13,continua5
+
+0350 750C01          613                                     mov             MES,#1
+
+0353 80C6            614                                     jmp             continua5
+
+                     615     
+
+0355                 616     ajusteano:              
+
+0355 050D            617                                     inc             ANO                                        
+                                  ; MIN = MIN + 1
+
+0357 E50D            618                                     mov             a,ANO
+
+0359 B46305          619                                     cjne    a,#99,varredurax
+
+035C 750D00          620                                     mov             ANO,#0
+
+035F 8000            621                                     jmp             varredurax
+
+                     622                             
+
+                     623     
+
+0361                 624     varredurax:
+
+0361 0122            625                                     jmp varreduradisplay
+
+                     626     
+
+                     627     
+
+                     628     
+
+                     629     
+
+                     630                             
+
+0363                 631     tabela: 
+
+0363 C0              632                                     db      0c0h                                            ; 0
+
+0364 F9              633                                     db      0F9h                                            ; 1
+                              
+
+0365 A4              634                                     db      0A4h                                            ; 2
+                              
+
+0366 B0              635                                     db      0B0h                                            ; 3
+                              
+
+0367 99              636                                     db      099h                                            ; 4
+                              
+
+0368 92              637                                     db      092h                                            ; 5
+                              
+
+0369 82              638                                     db      082h                                            ; 6
+                              
+
+036A F8              639                                     db      0F8h                                            ; 7
+                              
+
+036B 80              640                                     db      080h                                            ; 8
+                              
+
+036C 90              641                                     db      090h                                            ; 9
+                              
+
+                     642     
+
+                     643     end
+
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE    13
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+AJUSTE . . . . . .  C ADDR   030CH   A   
+AJUSTEANO. . . . .  C ADDR   0355H   A   
+AJUSTEDIA. . . . .  C ADDR   033DH   A   
+AJUSTEHORA . . . .  C ADDR   0331H   A   
+AJUSTEMES. . . . .  C ADDR   0349H   A   
+AJUSTEMIN. . . . .  C ADDR   0325H   A   
+AJUSTESEG. . . . .  C ADDR   0320H   A   
+ANO. . . . . . . .  D ADDR   000DH   A   
+ANOBISSEXTO. . . .  C ADDR   02FAH   A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+BANO . . . . . . .  B ADDR   00B0H.7 A   
+BDATA. . . . . . .  B ADDR   00B0H.0 A   
+BDIA . . . . . . .  B ADDR   00B0H.5 A   
+BHOR . . . . . . .  B ADDR   00B0H.4 A   
+BMES . . . . . . .  B ADDR   00B0H.6 A   
+BMIN . . . . . . .  B ADDR   00B0H.3 A   
+BSEGS. . . . . . .  B ADDR   00B0H.2 A   
+BSEM . . . . . . .  B ADDR   00B0H.1 A   
+CALCDIA. . . . . .  C ADDR   011EH   A   
+CANO . . . . . . .  D ADDR   0010H   A   
+CMES . . . . . . .  D ADDR   000FH   A   
+COD0 . . . . . . .  D ADDR   0011H   A   
+COD1 . . . . . . .  D ADDR   0012H   A   
+COD2 . . . . . . .  D ADDR   0013H   A   
+COD3 . . . . . . .  D ADDR   0014H   A   
+COD4 . . . . . . .  D ADDR   0015H   A   
+COD5 . . . . . . .  D ADDR   0016H   A   
+COD6 . . . . . . .  D ADDR   0017H   A   
+COD7 . . . . . . .  D ADDR   0018H   A   
+CONTADOR . . . . .  C ADDR   0217H   A   
+CONTH. . . . . . .  D ADDR   001AH   A   
+CONTINUA1. . . . .  C ADDR   030FH   A   
+CONTINUA2. . . . .  C ADDR   0312H   A   
+CONTINUA3. . . . .  C ADDR   0315H   A   
+CONTINUA4. . . . .  C ADDR   0318H   A   
+CONTINUA5. . . . .  C ADDR   031BH   A   
+CONTL. . . . . . .  D ADDR   0019H   A   
+CONVERTEANO. . . .  C ADDR   0092H   A   
+CONVERTEMES. . . .  C ADDR   00BFH   A   
+DENOVO . . . . . .  C ADDR   008AH   A   
+DIA. . . . . . . .  D ADDR   000BH   A   
+DIASEMANA. . . . .  D ADDR   000EH   A   
+DIF. . . . . . . .  C ADDR   0240H   A   
+DIF2 . . . . . . .  C ADDR   024EH   A   
+DIF28. . . . . . .  C ADDR   02F1H   A   
+DIF29. . . . . . .  C ADDR   0301H   A   
+DIF3 . . . . . . .  C ADDR   025EH   A   
+DIF30. . . . . . .  C ADDR   02C7H   A   
+DIF31. . . . . . .  C ADDR   02A8H   A   
+DIF31X . . . . . .  C ADDR   02D7H   A   
+DIF7 . . . . . . .  C ADDR   00ADH   A   
+DIF99. . . . . . .  C ADDR   02B9H   A   
+DIFABR . . . . . .  C ADDR   027BH   A   
+DIFABRIL . . . . .  C ADDR   00E1H   A   
+DIFAGO . . . . . .  C ADDR   028FH   A   
+DIFAGOSTO. . . . .  C ADDR   0101H   A   
+DIFDOM . . . . . .  C ADDR   016AH   A   
+DIFFEV . . . . . .  C ADDR   0271H   A   
+DIFFEVEREIRO . . .  C ADDR   00D1H   A   
+DIFJAN . . . . . .  C ADDR   026CH   A   
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE    14
+
+DIFJANEIRO . . . .  C ADDR   00C9H   A   
+DIFJUL . . . . . .  C ADDR   028AH   A   
+DIFJULHO . . . . .  C ADDR   00F9H   A   
+DIFJUN . . . . . .  C ADDR   0285H   A   
+DIFJUNHO . . . . .  C ADDR   00F1H   A   
+DIFMAI . . . . . .  C ADDR   0280H   A   
+DIFMAIO. . . . . .  C ADDR   00E9H   A   
+DIFMAR . . . . . .  C ADDR   0276H   A   
+DIFMARCO . . . . .  C ADDR   00D9H   A   
+DIFNOV . . . . . .  C ADDR   029EH   A   
+DIFNOVEMBRO. . . .  C ADDR   0119H   A   
+DIFOUT . . . . . .  C ADDR   0299H   A   
+DIFOUTUBRO . . . .  C ADDR   0111H   A   
+DIFQUA . . . . . .  C ADDR   0194H   A   
+DIFQUI . . . . . .  C ADDR   01A2H   A   
+DIFSAB . . . . . .  C ADDR   015CH   A   
+DIFSEG . . . . . .  C ADDR   0178H   A   
+DIFSET . . . . . .  C ADDR   0294H   A   
+DIFSETEMBRO. . . .  C ADDR   0109H   A   
+DIFTER . . . . . .  C ADDR   0186H   A   
+DIFW . . . . . . .  C ADDR   022BH   A   
+DISP0. . . . . . .  B ADDR   00A0H.4 A   
+DISP1. . . . . . .  B ADDR   00A0H.0 A   
+DISP2. . . . . . .  B ADDR   00A0H.1 A   
+DISP3. . . . . . .  B ADDR   00A0H.2 A   
+DISP4. . . . . . .  B ADDR   00A0H.3 A   
+DISP5. . . . . . .  B ADDR   00A0H.5 A   
+DISP6. . . . . . .  B ADDR   00A0H.6 A   
+DISP7. . . . . . .  B ADDR   00A0H.7 A   
+ENCONTRO . . . . .  C ADDR   0082H   A   
+ENCONTRO1. . . . .  C ADDR   030AH   A   
+ENCONTRO1X . . . .  C ADDR   025CH   A   
+FEV. . . . . . . .  C ADDR   02E0H   A   
+HORA . . . . . . .  D ADDR   000AH   A   
+INICIO . . . . . .  C ADDR   0000H   A   
+MES. . . . . . . .  D ADDR   000CH   A   
+MES30. . . . . . .  C ADDR   02C0H   A   
+MES31. . . . . . .  C ADDR   02D0H   A   
+MIN. . . . . . . .  D ADDR   0009H   A   
+MOSTRADATA . . . .  C ADDR   01E2H   A   
+MOSTRADATAX. . . .  C ADDR   013BH   A   
+MOSTRADIA. . . . .  C ADDR   013DH   A   
+MOSTRAHORA . . . .  C ADDR   01ADH   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+PULAR. . . . . . .  C ADDR   021FH   A   
+ROT0 . . . . . . .  C ADDR   0079H   A   
+ROT1 . . . . . . .  C ADDR   003AH   A   
+ROT2 . . . . . . .  C ADDR   0043H   A   
+ROT3 . . . . . . .  C ADDR   004CH   A   
+ROT4 . . . . . . .  C ADDR   0055H   A   
+ROT5 . . . . . . .  C ADDR   005EH   A   
+ROT6 . . . . . . .  C ADDR   0067H   A   
+ROT7 . . . . . . .  C ADDR   0070H   A   
+SEGS . . . . . . .  D ADDR   0008H   A   
+SELDISPLAY1. . . .  C ADDR   0133H   A   
+SELDISPLAY2. . . .  C ADDR   0136H   A   
+SOMA_MENOR . . . .  C ADDR   00B8H   A   
+TABELA . . . . . .  C ADDR   0363H   A   
+TF0. . . . . . . .  B ADDR   0088H.5 A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+VARREDURADISPLAY .  C ADDR   0022H   A   
+VARREDURAX . . . .  C ADDR   0361H   A   
+A51 MACRO ASSEMBLER  TIMER_12_AS                                                          06/08/2021 18:05:28 PAGE    15
+
+VARREDURAY . . . .  C ADDR   0235H   A   
+VOLTA. . . . . . .  C ADDR   0237H   A   
+ZERACONTADOR . . .  C ADDR   022DH   A   
+ZERAS. . . . . . .  C ADDR   0242H   A   
+ZERAS2 . . . . . .  C ADDR   0250H   A   
+ZERAS3 . . . . . .  C ADDR   0260H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
