@@ -1,0 +1,3 @@
+".\Objects\timer-12-as.obj" 
+TO ".\Objects\timer-12-assembly" 
+PRINT(".\Listings\timer-12-assembly.m51") RAMSIZE(256) 
