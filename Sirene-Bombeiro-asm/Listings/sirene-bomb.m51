@@ -1,0 +1,95 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        06/18/2021  20:06:18  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\sirene-bomb.obj TO .\Objects\sirene-bomb PRINT (.\Listings\sirene-bomb.m51) RAMSIZ
+>> E (256)
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\sirene-bomb.obj (SIRENE_BOMB)
+
+
+LINK MAP OF MODULE:  .\Objects\sirene-bomb (SIRENE_BOMB)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0001H     ABSOLUTE     
+                    0009H     001BH                  *** GAP ***
+            BIT     0024H.0   0000H.1   ABSOLUTE     
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0002H     ABSOLUTE     
+                    0002H     0009H                  *** GAP ***
+            CODE    000BH     0043H     ABSOLUTE     
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\sirene-bomb (SIRENE_BOMB)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        SIRENE_BOMB
+  D:0008H         SYMBOL        CONT
+  C:0049H         SYMBOL        ENCONTRO1
+  B:0024H.0       SYMBOL        FLAG
+  C:0044H         SYMBOL        FLAG_SIM
+  D:00A8H         SYMBOL        IE
+  C:000DH         SYMBOL        INICIO
+  D:00B8H         SYMBOL        IP
+  D:0090H         SYMBOL        P1
+  B:0090H.6       SYMBOL        SOM
+  D:0081H         SYMBOL        SP
+  B:0088H.7       SYMBOL        TF1
+  C:002BH         SYMBOL        TF1_SIM
+  D:008CH         SYMBOL        TH0
+  D:008DH         SYMBOL        TH1
+  C:004BH         SYMBOL        TIMER0
+  D:0089H         SYMBOL        TMOD
+  B:0088H.4       SYMBOL        TR0
+  B:0088H.6       SYMBOL        TR1
+  C:0026H         SYMBOL        VOLTA
+  C:0000H         LINE#         24
+  C:000BH         LINE#         27
+  C:000DH         LINE#         34
+  C:0010H         LINE#         37
+  C:0013H         LINE#         38
+BL51 BANKED LINKER/LOCATER V6.22                                                      06/18/2021  20:06:18  PAGE 2
+
+
+  C:0016H         LINE#         39
+  C:0019H         LINE#         40
+  C:001BH         LINE#         41
+  C:001DH         LINE#         44
+  C:0020H         LINE#         45
+  C:0023H         LINE#         48
+  C:0026H         LINE#         55
+  C:0029H         LINE#         56
+  C:002BH         LINE#         60
+  C:002DH         LINE#         61
+  C:0030H         LINE#         62
+  C:0032H         LINE#         63
+  C:0034H         LINE#         64
+  C:0037H         LINE#         65
+  C:003AH         LINE#         66
+  C:003DH         LINE#         67
+  C:0040H         LINE#         68
+  C:0042H         LINE#         69
+  C:0044H         LINE#         72
+  C:0047H         LINE#         73
+  C:0049H         LINE#         76
+  C:004BH         LINE#         83
+  C:004DH         LINE#         84
+  -------         ENDMOD        SIRENE_BOMB
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0045H BYTE ( 3%) *
+******************************************************************************
+
+Program Size: data=9.1 xdata=0 code=69
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

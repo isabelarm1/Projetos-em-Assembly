@@ -1,0 +1,3 @@
+".\Objects\sirene-bomb.obj" 
+TO ".\Objects\sirene-bomb" 
+PRINT(".\Listings\sirene-bomb.m51") RAMSIZE(256) 
